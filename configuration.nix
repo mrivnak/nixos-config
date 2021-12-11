@@ -28,7 +28,7 @@
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = false;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "nixos-server"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -40,24 +40,23 @@
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
   networking.useDHCP = false;
-  networking.interfaces.enp0s3.useDHCP = true;
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+  networking.interfaces.enp2s0.useDHCP = true;
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  # };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.michael = {
     isNormalUser = true;
     description = "Michael";
-    shell = pkgs.zsh;
+    extraGroups = [
+      "docker"
+      "wheel"
+    ];
+  };
+  users.users.mig = {
+    isNormalUser = true;
+    description = "Mig";
     extraGroups = [
       "docker"
       "wheel"
@@ -70,7 +69,6 @@
     git
     home-manager
     neovim
-    # nix-vscode-server
     wget
   ];
   nixpkgs.config.allowUnfree = true;
