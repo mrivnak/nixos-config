@@ -98,7 +98,7 @@
   networking.firewall.enable = true;
   networking.firewall.package = pkgs.nftables;
   networking.firewall.allowedTCPPorts = [
-    25566 # mc-vanilla
+    25565 # mc-vanilla
   ];
   services.fail2ban.enable = true;
 
