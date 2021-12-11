@@ -49,6 +49,7 @@
   users.users.michael = {
     isNormalUser = true;
     description = "Michael";
+    shell = pkgs.zsh;
     extraGroups = [
       "docker"
       "wheel"
@@ -57,6 +58,7 @@
   users.users.mig = {
     isNormalUser = true;
     description = "Mig";
+    shell = pkgs.zsh;
     extraGroups = [
       "docker"
       "wheel"
