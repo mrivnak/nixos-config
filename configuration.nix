@@ -12,8 +12,6 @@
       <home-manager/nixos>
     ];
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
   system.autoUpgrade.enable = false;
   system.autoUpgrade.allowReboot = false;
 
