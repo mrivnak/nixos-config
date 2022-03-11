@@ -1,4 +1,4 @@
-# Edit this configuration file to define what should be installed on
+# Edit this configuration file to define whaot should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
@@ -7,8 +7,6 @@
 {
 	imports = [
 		./hardware-configuration.nix
-		./docker-configuration.nix
-		./snapper-configuration.nix
 		<home-manager/nixos>
 	];
 
@@ -22,7 +20,12 @@
 		'';
 	};
 
+	# BTRFS Configs
 	boot.supportedFilesystems = [ "btrfs" ];
+	services.btrfs.autoScrub = {
+		enable = true;
+		interval = "weekly";
+	};
 
 	# Use the systemd-boot EFI boot loader.
 	boot.loader.systemd-boot.enable = true;
@@ -66,11 +69,14 @@
 	# List packages installed in system profile. To search, run:
 	environment.systemPackages = with pkgs; [
 		curl
+		file
 		git
 		home-manager
 		neovim
-	openssl
+		openssl
+		unzip
 		wget
+		vim
 	];
 	nixpkgs.config.allowUnfree = true;
 
@@ -93,17 +99,115 @@
 		'';
 	};
 
+	virtualisation.docker = {
+		enable = true;
+		storageDriver = "btrfs";
+  	};
+
 	# Open ports in the firewall.
 	networking.firewall.enable = true;
 	networking.firewall.allowedTCPPorts = [
 		8123  # home assistant
 		21064 # home assistant HomeKit plugin
+		5222  # home assistant Logitech Harmony
 		25565 # mc-vanilla
+		25566 # mc-enigmatica-6
+		25567 # mx-matt-vanilla
+		7777  # terraria
+		7778  # terraria-tmodloader
+		1883  # mosquitto
+		80    # nginx
+		8080  # nginx
+		9443  # portainer
 	];
 	networking.firewall.allowedUDPPorts = [
 		5353  # mDNS
+		24642 # stardew
 	];
 	services.fail2ban.enable = true;
+
+	services.snapper.snapshotInterval = "hourly";
+	services.snapper.cleanupInterval = "1d";
+	services.snapper.configs = {
+		root = {
+			subvolume = "/";
+			extraConfig = ''
+				ALLOW_GROUPS=""
+				ALLOW_USERS=""
+				BACKGROUND_COMPARISON=yes
+				EMPTY_PRE_POST_CLEANUP=yes
+				EMPTY_PRE_POST_MIN_AGE=1800
+				FREE_LIMIT=0.2
+				NUMBER_CLEANUP=yes
+				NUMBER_LIMIT=50
+				NUMBER_LIMIT_IMPORTANT=10
+				NUMBER_MIN_AGE=1800
+				QGROUP=""
+				SPACE_LIMIT=0.5
+				SYNC_ACL=no
+				TIMELINE_CLEANUP=yes
+				TIMELINE_CREATE=yes
+				TIMELINE_LIMIT_DAILY=7
+				TIMELINE_LIMIT_HOURLY=12
+				TIMELINE_LIMIT_MONTHLY=6
+				TIMELINE_LIMIT_WEEKLY=4
+				TIMELINE_LIMIT_YEARLY=2
+				TIMELINE_MIN_AGE=1800
+			'';
+		};
+		home = {
+			subvolume = "/home";
+			extraConfig = ''
+				ALLOW_GROUPS=""
+				ALLOW_USERS=""
+				BACKGROUND_COMPARISON=yes
+				EMPTY_PRE_POST_CLEANUP=yes
+				EMPTY_PRE_POST_MIN_AGE=1800
+				FREE_LIMIT=0.2
+				NUMBER_CLEANUP=yes
+				NUMBER_LIMIT=50
+				NUMBER_LIMIT_IMPORTANT=10
+				NUMBER_MIN_AGE=1800
+				QGROUP=""
+				SPACE_LIMIT=0.5
+				SYNC_ACL=no
+				TIMELINE_CLEANUP=yes
+				TIMELINE_CREATE=yes
+				TIMELINE_LIMIT_DAILY=7
+				TIMELINE_LIMIT_HOURLY=24
+				TIMELINE_LIMIT_MONTHLY=6
+				TIMELINE_LIMIT_WEEKLY=4
+				TIMELINE_LIMIT_YEARLY=2
+				TIMELINE_MIN_AGE=1800
+			'';
+		};
+		docker = {
+			subvolume = "/var/lib/docker";
+			extraConfig = ''
+				ALLOW_GROUPS=""
+				ALLOW_USERS=""
+				BACKGROUND_COMPARISON=yes
+				EMPTY_PRE_POST_CLEANUP=yes
+				EMPTY_PRE_POST_MIN_AGE=1800
+				FREE_LIMIT=0.2
+				NUMBER_CLEANUP=yes
+				NUMBER_LIMIT=50
+				NUMBER_LIMIT_IMPORTANT=10
+				NUMBER_MIN_AGE=1800
+				QGROUP=""
+				SPACE_LIMIT=0.5
+				SYNC_ACL=no
+				TIMELINE_CLEANUP=yes
+				TIMELINE_CREATE=yes
+				TIMELINE_LIMIT_DAILY=7
+				TIMELINE_LIMIT_HOURLY=24
+				TIMELINE_LIMIT_MONTHLY=6
+				TIMELINE_LIMIT_WEEKLY=4
+				TIMELINE_LIMIT_YEARLY=2
+				TIMELINE_MIN_AGE=1800
+			'';
+		};
+	};
 
 	# This value determines the NixOS release from which the default
 	# settings for stateful data, like file locations and database versions
